@@ -87,6 +87,12 @@ func (DBConnection *MariaDBPlugin) performFreshDBInstall() error {
 		logging.WriteLog(logging.LogLevelError, "MariaDBPlugin/performFreshDBInstall", "0", logging.ResultFailure, []string{"Failed to install database", err.Error()})
 		return err
 	}
+	//Ignore Foreign key constraint
+	_, err := DBConnection.DBHandle.Exec("SET FOREIGN_KEY_CHECKS=0;")
+	if err != nil {
+		logging.WriteLog(logging.LogLevelError, "MariaDBPlugin/performFreshDBInstall", "0", logging.ResultFailure, []string{"Failed to install database", err.Error()})
+		return err
+	}
 	//Images and tags
 	_, err = DBConnection.DBHandle.Exec("CREATE TABLE Tags (ID BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE, Name VARCHAR(255) NOT NULL UNIQUE, Description VARCHAR(255), UploaderID BIGINT UNSIGNED NOT NULL, UploadTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, AliasedID BIGINT UNSIGNED NOT NULL DEFAULT 0, IsAlias BOOL NOT NULL DEFAULT FALSE);")
 	if err != nil {
